@@ -1,0 +1,218 @@
+openapi: 3.0.1
+info:
+  title: Demo Appliance APIs
+  description: The **Demo Appliance APIs** provide some sample APIs for testing purposes.
+  contact:
+    email: support@qubecinema.com
+  license:
+    name: Qube Cinema Technologies Pvt. Ltd.
+    url: https://www.qubecinema.com
+  version: "1.0"
+tags:
+  - name: appliance
+    description: APIs to get information about appliances.
+
+paths:
+  /api/v1/appliances:
+    get:
+      tags:
+        - appliance
+      summary: Get all appliances info.
+      description: Get breif info about all appliances.
+      parameters:
+        - name: deviceStatus
+          description: The status of the appliance.
+          in: query
+          schema:
+            type: string
+        - name: downloadStatus
+          description: The status of the most recent download.
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: All appliances info.
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  appliances:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AllAppliances"
+              example:
+                appliances:
+                  - serialNo: "JTD-512312"
+                    theatreName: "Kriplle Square"
+                    location:
+                      city: "New Delhi"
+                      state: "Delhi"
+                      country: "India"
+                    bandwidth: "1 Gbps"
+                    avgBandwidth: "812 Kbps"
+                    deviceStatus: "Offline"
+                    downloadStatus: "Failed"
+                    osVersion: "5.2.1.3"
+        500:
+          description: Internal Server Error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/appliance/{appliance-id}/info:
+    get:
+      tags:
+        - appliance
+      summary: Get info about an appliance.
+      description: Get comprehensive information about a single appliance.
+      parameters:
+        - name: appliance-id
+          description: The Applicance serial number.
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Info about an appliance.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ApplianceInfo"
+              example:
+                serialNo: "JTD-512312"
+                theatreName: "Kriplle Square"
+                location:
+                  city: "New Delhi"
+                  state: "Delhi"
+                  country: "India"
+                bandwidth: "1 Gbps"
+                avgBandwidth: "812 Kbps"
+                deviceStatus: "Offline" 
+                downloadStatus: "Failed"
+                osVersion: "5.2.1.3"
+                ispPaymentResponsibility: "Qube"
+                planStartDate: "2023-10-01T10:00:00Z"
+                billingCycle: "Monthly"
+                storage: "828 GB"
+        404:
+          description: Appliance not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal Server Error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    AllAppliances:
+      type: object
+      properties:
+        serialNo:
+          type: string
+          description: The serial number of the appliance.
+        theatreName:
+          type: string
+          description: The name of the theater where the appliance is installed.
+        location:
+          type: object
+          description: The location information of the theater where the appliance is installed
+          properties:
+            city:
+              type: string
+            state:
+              type: string
+            country:
+              type: string
+        bandwidth:
+          type: string
+          description: The current bandwidth of the appliance.
+        avgBandwidth:
+          type: string
+          description: The average bandwidth of the appliance.
+        deviceStatus:
+          type: string
+          enum: ["offline", "online"]
+          description: The status of the appliance.
+        downloadStatus:
+          type: string
+          enum: ["failed", "cancelled", "downloading", "succeeded"]
+          description: The content download status of the appliance.
+        osVersion:
+          type: string
+          description: The OS version of the appliance.
+    ApplianceInfo:
+      type: object
+      properties:
+        serialNo:
+          type: string
+          description: The serial number of the appliance.
+        theatreName:
+          type: string
+          description: The name of the theater where the appliance is installed.
+        location:
+          type: object
+          description: The location information of the theater where the appliance is installed
+          properties:
+            city:
+              type: string
+            state:
+              type: string
+            country:
+              type: string
+        ispPaymentResponsibility:
+          type: string
+          description: The entity responsible for the appliance's ISP payment.
+        bandwidth:
+          type: string
+          description: The current bandwidth of the appliance.
+        avgBandwidth:
+          type: string
+          description: The average bandwidth of the appliance.
+        planStartDate:
+          type: string
+          description: Plan starting date in RFC3339 format.
+        billingCycle:
+          type: string
+          enum: ["monthly", "quarterly", "annual"]
+          description: The billing cycle.
+        deviceStatus:
+          type: string
+          enum: ["offline", "online"]
+          description: The status of the appliance.
+        downloadStatus:
+          type: string
+          enum: ["failed", "cancelled", "downloading", "succeeded"]
+          description: The content download status of the appliance.
+        osVersion:
+          type: string
+          description: The OS version of the appliance.
+        storage:
+          type: string
+          description: The available storage in the appliance.
+    ErrorMessage:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        httpStatus:
+          type: integer
+        httpCode:
+          type: string
+        requestId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ErrorMessage"
